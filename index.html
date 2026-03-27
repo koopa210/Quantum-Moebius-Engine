@@ -15,7 +15,7 @@
         .highlight-prime { color: #ff4400; font-weight: bold; text-shadow: 0 0 5px #ff4400; } 
         .highlight-zero { color: #00ffff; font-weight: bold; text-shadow: 0 0 5px #00ffff; } 
         
-        #controls { position: absolute; bottom: 20px; right: 20px; z-index: 20; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; border: 1px solid #00ffff; display: flex; gap: 10px; pointer-events: auto;}
+        #controls { position: absolute; bottom: 20px; left: 20px; z-index: 20; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; border: 1px solid #00ffff; display: flex; gap: 10px; pointer-events: auto;}
         .btn { background: #00ffff; color: #000; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; border-radius: 4px; font-family: monospace; font-size: 14px; transition: 0.2s; }
         .btn:hover { box-shadow: 0 0 8px #00ffff; }
         input[type="text"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -43,7 +43,7 @@
         .loader-fill { width: 0%; height: 100%; background: #ff0000; box-shadow: 0 0 10px #ff0000; }
         @keyframes glitch { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
 
-        /* RESTORED TOOLTIP AND ANALYSIS PANEL */
+        /* ANALYSIS PANEL */
         #tooltip { position: absolute; background: rgba(0,20,40,0.95); border: 1px solid #ff4400; color: #fff; padding: 10px 14px; border-radius: 5px; pointer-events: none; display: none; z-index: 100; font-family: monospace; font-size: 13px; box-shadow: 0 4px 12px rgba(255,68,0,0.3); }
         hr { border-color: rgba(255,255,255,0.2); margin: 6px 0; }
 
@@ -57,11 +57,9 @@
     <div id="seize-overlay">
         <h1>MANIFOLD TENSION SPIKE</h1>
         <p style="font-size: 18px;">RE-CALIBRATING TOPOLOGICAL FEEDBACK LOOP...</p>
-        <p style="font-size: 14px; color: #ffa;">Flushing GUE Spacing Parameters...</p>
         <div class="loader-bar"><div class="loader-fill" id="seize-fill"></div></div>
     </div>
 
-    <!-- RESTORED ANALYSIS SIDEBAR -->
     <div id="data-panel">
         <h2>Topological Vector Analysis</h2>
         <div id="data-content"></div>
@@ -74,10 +72,6 @@
         <p><strong>Timeline (Input Energy):</strong> <span id="n-val" style="font-family: monospace; font-size:18px;">2.00</span></p>
         <p><strong>System State:</strong> <span id="state-val">Calibrating Topology...</span></p>
         <hr>
-        <p style="font-size: 11px; max-width: 320px; color: #aaa;">
-            <strong>INTERACTIVE PROOF:</strong> The Curvature Heat Map explicitly builds High-Tension (Red/Orange) structural boundary anchors. 
-            <strong style="color:#ffaa00;">CLICK ON ANY TENSION BOUNDARY (RED NODE)</strong> to actively extract its algebraic Riemann equivalence state!
-        </p>
         <div style="margin-top: 15px; display: flex; gap: 8px; pointer-events: auto;">
             <input type="text" id="inp-jump" placeholder="Jump e.g. 1e12" style="background: rgba(0,255,255,0.1); border: 1px solid #00ffff; color: #fff; padding: 5px; border-radius: 4px; font-family: monospace; width: 140px;">
             <button id="btn-jump" class="btn" style="background:#ff00ff; color:#fff;">Stress Test</button>
@@ -89,11 +83,10 @@
         <div class="eq-container" id="eq-box"></div>
 
         <div class="tel-title">2. STEERING TELEMETRY (PARITY TILT)</div>
-        <p style="font-size: 10px; margin:-5px 0 5px 0; color:#aaa;">System oscillating around 0.5000 invariant center to prevent buffer overflow.</p>
+        <p style="font-size: 10px; margin:-5px 0 5px 0; color:#aaa;">System oscillating around 0 invariant center.</p>
         <div class="meter-container"><div class="meter-center"></div><div class="meter-fill" id="tilt-fill"></div></div>
 
         <div class="tel-title">3. PHASE SPACE STABILITY (POINCARÉ MAP)</div>
-        <p style="font-size: 10px; margin:-5px 0 5px 0; color:#aaa;">Tracking 2D manifold cross-sections validating structural attractor orbit.</p>
         <div id="poincare-box">
             <div class="poincare-ax" id="px-ax"></div><div class="poincare-ax" id="py-ax"></div>
         </div>
@@ -101,7 +94,8 @@
 
     <div id="controls">
         <button id="btn-zoom" class="btn" style="background: #00ff00;">Auto-Frame: ON</button>
-        <button id="btn-play" class="btn">Pause Simulation</button>
+        <button id="btn-play" class="btn">Pause</button>
+        <button id="btn-parity" class="btn" style="background: #555; color: #00ffff;">Negative Parity: OFF</button>
     </div>
     
     <div id="tooltip"></div>
@@ -129,7 +123,6 @@
             79.33, 82.91, 84.73, 87.42, 88.80, 92.49, 94.65, 95.87, 98.83, 101.31
         ];
 
-        // UI INJECTIONS
         const eqBox = document.getElementById('eq-box');
         const eqBars = [];
         for(let i=0; i<30; i++) {
@@ -146,7 +139,6 @@
         const tiltFill = document.getElementById('tilt-fill');
         const poincareBox = document.getElementById('poincare-box');
 
-        // RAYCASTER TOOLS RESTORED!
         const interactables = [];
 
         const singularityGeo = new THREE.SphereGeometry(0.25, 32, 32);
@@ -154,14 +146,11 @@
         const singularityMesh = new THREE.Mesh(singularityGeo, singularityMat);
         scene.add(singularityMesh);
         
-        singularityMesh.userData = { 
-            type: 'Zero', 
-            val: 'The Critical Line Singularity',
-        };
+        singularityMesh.userData = { type: 'Zero', val: 'The Critical Line Singularity' };
         interactables.push(singularityMesh);
-        
         scene.add(new THREE.PointLight(0x00ffff, 2, 50));
 
+        // Positive Tracing
         const traceMaxPts = 500000; 
         const tracePositions = new Float32Array(traceMaxPts * 3);
         const traceColors = new Float32Array(traceMaxPts * 3);
@@ -169,19 +158,39 @@
         traceGeo.setAttribute('position', new THREE.BufferAttribute(tracePositions, 3));
         traceGeo.setAttribute('color', new THREE.BufferAttribute(traceColors, 3));
         traceGeo.setDrawRange(0, 0);
-        
         const traceMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, linewidth: 2 });
         const traceLine = new THREE.Line(traceGeo, traceMat);
         scene.add(traceLine);
 
+        // Negative Tracing (Symmetrical)
+        let showNegative = false;
+        const traceNegPositions = new Float32Array(traceMaxPts * 3);
+        const traceNegColors = new Float32Array(traceMaxPts * 3);
+        const traceNegGeo = new THREE.BufferGeometry();
+        traceNegGeo.setAttribute('position', new THREE.BufferAttribute(traceNegPositions, 3));
+        traceNegGeo.setAttribute('color', new THREE.BufferAttribute(traceNegColors, 3));
+        traceNegGeo.setDrawRange(0, 0);
+        const traceNegMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, linewidth: 2 });
+        const traceNegLine = new THREE.Line(traceNegGeo, traceNegMat);
+        scene.add(traceNegLine);
+        traceNegLine.visible = false;
+
         const primesGroup = new THREE.Group();
         scene.add(primesGroup);
 
-        const spark = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), new THREE.MeshBasicMaterial({color: 0xffffff}));
-        spark.add(new THREE.PointLight(0xffffff, 2.0, 15));
-        scene.add(spark);
+        const primesNegGroup = new THREE.Group();
+        scene.add(primesNegGroup);
+        primesNegGroup.visible = false;
 
-        // RAYCASTING EVENT LISTENERS RESTORED!
+        document.getElementById('btn-parity').onclick = (e) => {
+            showNegative = !showNegative;
+            e.target.innerText = showNegative ? "Negative Parity: ON" : "Negative Parity: OFF";
+            e.target.style.background = showNegative ? "#ff00ff" : "#555";
+            e.target.style.color = showNegative ? "#000" : "#00ffff";
+            traceNegLine.visible = showNegative;
+            primesNegGroup.visible = showNegative;
+        };
+
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let mouseX = 0, mouseY = 0;
@@ -197,7 +206,6 @@
             controls.autoRotateSpeed = 0.2;
         });
 
-        // The exact verification proof event
         window.addEventListener('click', () => {
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(interactables);
@@ -209,45 +217,33 @@
                         <strong>Target:</strong> ${data.val}<br>
                         <strong>Algebraic Invariant Function:</strong><br>
                         <div class="formula-box">&zeta;(s) = 0 &rArr; Re(s) = 1/2</div>
-                        <p style="color:#aaa;">The topological engine physically mandates that to move from Prime A to Prime B, all momentum is folded through this absolute spatial singularity axis. Zero Energy leakage permitted.</p>
+                        <p style="color:#aaa;">The topological engine physically mandates that to move from Prime A to Prime B, all momentum is folded through this absolute spatial singularity axis.</p>
                     `;
-                } else if (data.type === 'Prime') {
-                    // Evaluate the Riemann Explicit Sum mathematically for this prime!
+                } else if (data.type === 'Prime' || data.type === 'NegativePrime') {
                     let sumZero = 0;
-                    const lnx = Math.log(data.val);
+                    const valAbs = Math.abs(data.val);
+                    const lnx = Math.log(valAbs);
                     for(let i=0; i<zeros_gamma.length; i++){
                         sumZero += Math.cos(zeros_gamma[i] * lnx);
                     }
                     const resonancePcnt = ((Math.max(0, sumZero) / 30) * 100).toFixed(2);
 
                     dataContent.innerHTML = `
-                        <strong>Target:</strong> Structural Tension Node (Prime Boundary)<br>
+                        <strong>Target:</strong> Structural Tension Node<br>
                         <strong>Value (n):</strong> <span style="font-size:16px; color:#fff;">${data.val}</span><br>
-                        <strong>Local Phase Gap:</strong> ${data.gap}<br>
                         <hr>
                         <strong>Topological Phase Angle (&theta;)</strong><br>
                         <div class="formula-box">&theta; = &pi; × ${data.k}</div>
                         <hr>
-                        <strong>Spatial Geometry Coordinates</strong><br>
-                        <div class="formula-box" style="font-size:11px;">
-                        X = (n/3) × cos(&theta;)<br>
-                        Y = (n/3) × cos(&theta;) × sin(&theta;/2)<br>
-                        Z = (n/3) × sin(&theta;)
-                        </div>
-                        <hr>
                         <strong>Riemann Harmonic Correlation</strong><br>
-                        <p style="margin:5px 0; color:#ccc; font-size:11px;">The 30 Active Zeros algebraically sum together proving structural identity:</p>
-                        <div class="formula-box">&Sigma; cos(&gamma; · ln(${data.val}))</div>
-                        <strong style="color:#00ff00;">Harmonic Resonance Alignment: ${resonancePcnt}%</strong><br>
-                        <span style="font-size:11px;">(Symmetrical Constructive Fourier Overlap Confirmed)</span>
+                        <div class="formula-box">&Sigma; cos(&gamma; · ln(${valAbs}))</div>
+                        <strong style="color:${data.type === 'Prime' ? '#00ff00' : '#ff00ff'};">Harmonic Resonance Alignment: ${resonancePcnt}%</strong><br>
                     `;
                 }
                 dataPanel.style.display = 'block';
             }
         });
 
-
-        // MATH LOGIC
         let x_cursor = 2.0; 
         const maxX = 1e300; 
         let dx = 0.01; 
@@ -281,7 +277,6 @@
 
             if (!isNaN(parsedVal) && parsedVal >= 2) {
                 if (parsedVal > 1.7e305) parsedVal = 1e100;
-
                 overlay.style.display = 'flex';
                 document.body.style.backgroundColor = '#200';
                 let loadPcnt = 0;
@@ -289,7 +284,6 @@
                 const loadInterval = setInterval(() => {
                     loadPcnt += 5;
                     seizeFill.style.width = loadPcnt + '%';
-                    
                     if (loadPcnt >= 100) {
                         clearInterval(loadInterval);
                         overlay.style.display = 'none';
@@ -301,12 +295,12 @@
         };
 
         function executeJump(targetX) {
-            x_cursor = targetX;
-            pathIdx = 0;
-            traceGeo.setDrawRange(0, 0);
+            x_cursor = targetX; pathIdx = 0;
+            traceGeo.setDrawRange(0, 0); traceNegGeo.setDrawRange(0, 0);
+
             while(primesGroup.children.length > 0) primesGroup.remove(primesGroup.children[0]);
-            
-            interactables.length = 1; // RESTORE: Keep the singularity interactive!
+            while(primesNegGroup.children.length > 0) primesNegGroup.remove(primesNegGroup.children[0]);
+            interactables.length = 1; 
             
             const dots = document.querySelectorAll('.poincare-dot');
             dots.forEach(d => d.remove());
@@ -318,7 +312,6 @@
             dx = Math.max(0.01, (p_next - p_k) / 200); 
 
             camera.position.setLength(Math.max(12, (x_cursor / Math.max(3.0, x_cursor / 100.0)) * 2.5));
-
             document.getElementById('state-val').innerHTML = `<span style="color: #ff00ff;">SUCCESS: Flushed and Recalibrated at ${x_cursor > 1e6 ? x_cursor.toExponential(4) : x_cursor}</span>`;
             parityTilt = 0; 
         }
@@ -330,7 +323,6 @@
         function stepMath() {
             if (x_cursor >= maxX || pathIdx >= traceMaxPts) return;
 
-            // 1. Structural Primes (HIGH TENSION RED BUBBLES)
             if (x_cursor >= p_next) {
                 p_k = p_next; p_next = findNextPrime(p_k + 1);
                 prime_k_index++;
@@ -340,25 +332,28 @@
                 const cScale = Math.max(3.0, x_cursor / 100.0);
                 const rR = x_cursor / cScale;
                 const pTh = Math.PI * prime_k_index;
-                const node = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.5, 0.5 + rR/100)), new THREE.MeshBasicMaterial({ color: 0xff4400 }));
-                node.position.set(rR * Math.cos(pTh), rR * Math.cos(pTh) * Math.sin(pTh / 2.0), rR * Math.sin(pTh));
-                primesGroup.add(node);
                 
-                // RESTORED INTERACTABLE PUSH WITH PROOF DATA
+                // Positive Anchor
+                const node = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.5, 0.5 + rR/100)), new THREE.MeshBasicMaterial({ color: 0xff4400 }));
+                const pX = rR * Math.cos(pTh); const pY = rR * Math.cos(pTh) * Math.sin(pTh / 2.0); const pZ = rR * Math.sin(pTh);
+                node.position.set(pX, pY, pZ);
+                
                 const valStr = p_k > 1e6 ? p_k.toExponential(4) : p_k;
                 const gapStr = (p_next - p_k) > 1e6 ? (p_next - p_k).toExponential(4) : (p_next - p_k);
-                node.userData = { 
-                    type: 'Prime', 
-                    val: p_k,
-                    gap: gapStr,
-                    k: prime_k_index,
-                    theta: pTh
-                };
+                node.userData = { type: 'Prime', val: p_k, gap: gapStr, k: prime_k_index, theta: pTh };
                 interactables.push(node);
-                ui_state.innerHTML = `<span class="highlight-prime">TENSION ANCHOR LOGGED AT n = ${valStr}</span>`;
+                primesGroup.add(node);
+
+                // Negative Parity Anchor (Magenta)
+                const negNode = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.5, 0.5 + rR/100)), new THREE.MeshBasicMaterial({ color: 0xff00ff }));
+                negNode.position.set(-pX, -pY, -pZ);
+                negNode.userData = { type: 'NegativePrime', val: -p_k, gap: gapStr, k: prime_k_index, theta: pTh };
+                interactables.push(negNode);
+                primesNegGroup.add(negNode);
+
+                document.getElementById('state-val').innerHTML = `<span class="highlight-prime">TENSION ANCHOR LOGGED AT n = &plusmn;${valStr}</span>`;
             }
 
-            // 2. Continuous Phase math
             const gap = p_next - p_k;
             const P_progress = (x_cursor - p_k) / gap;
             const theta = Math.PI * (prime_k_index + P_progress);
@@ -370,19 +365,27 @@
             const Y = raw_R * Math.cos(theta) * Math.sin(theta / 2.0); 
             const Z = raw_R * Math.sin(theta);
 
-            spark.position.set(X, Y, Z);
+            // Positive Log
             tracePositions[pathIdx * 3] = X; tracePositions[pathIdx * 3 + 1] = Y; tracePositions[pathIdx * 3 + 2] = Z;
-
             const tension = Math.abs((P_progress - 0.5) * 2); 
             const [r, g, b] = lerpColor(0.0, 1.0, 1.0, 1.0, 0.2, 0.0, tension);
             traceColors[pathIdx * 3] = r; traceColors[pathIdx * 3 + 1] = g; traceColors[pathIdx * 3 + 2] = b;
+
+            // Negative Log (Inverted Origin Symmetry)
+            traceNegPositions[pathIdx * 3] = -X; traceNegPositions[pathIdx * 3 + 1] = -Y; traceNegPositions[pathIdx * 3 + 2] = -Z;
+            const [nr, ng, nb] = lerpColor(0.0, 1.0, 1.0, 1.0, 0.0, 1.0, tension); // Cyan to Magenta
+            traceNegColors[pathIdx * 3] = nr; traceNegColors[pathIdx * 3 + 1] = ng; traceNegColors[pathIdx * 3 + 2] = nb;
 
             pathIdx++;
             traceGeo.setDrawRange(0, pathIdx);
             traceGeo.attributes.position.needsUpdate = true;
             traceGeo.attributes.color.needsUpdate = true;
+            
+            traceNegGeo.setDrawRange(0, pathIdx);
+            traceNegGeo.attributes.position.needsUpdate = true;
+            traceNegGeo.attributes.color.needsUpdate = true;
 
-            // UI Diagnostics Update
+            // Telemetry
             if (pathIdx % 4 === 0) { 
                 const lnx = Math.log(x_cursor);
                 for(let i=0; i<30; i++){
@@ -402,11 +405,11 @@
                     const dot = document.createElement('div');
                     dot.className = 'poincare-dot';
                     dot.style.position = 'absolute';
-                    dot.style.width = '2px'; dot.style.height = '2px'; dot.style.background = '#00ff00';
+                    dot.style.width = '2px'; dot.style.height = '2px'; dot.style.background = showNegative && Math.random() > 0.5 ? '#ff00ff' : '#00ff00';
                     const px = 50 + (X / raw_R) * 40 + (Math.random()*2 - 1); 
                     const py = 50 + (Z / raw_R) * 40 + (Math.random()*2 - 1);
                     dot.style.left = px + '%'; dot.style.top = py + '%';
-                    dot.style.boxShadow = "0 0 4px #00ff00";
+                    dot.style.boxShadow = "0 0 4px " + dot.style.background;
                     poincareBox.appendChild(dot);
                     dotsDrawn++;
                 }
@@ -417,7 +420,6 @@
             x_cursor += dx;
         }
 
-        // AUTO-ZOOM AND PLAY TIES
         let autoFrame = true;
         const btnZoom = document.getElementById('btn-zoom');
         window.addEventListener('wheel', () => { if (autoFrame) { autoFrame = false; btnZoom.innerText = "Auto-Frame: OFF (Manual)"; btnZoom.style.background = "#555"; btnZoom.style.color = "#00ffff"; } });
@@ -430,20 +432,25 @@
             requestAnimationFrame(animate);
             controls.update();
 
-            // RESTORED TOOLTIP EVENT LOOP
             raycaster.setFromCamera(mouse, camera);
             const checkIntersects = raycaster.intersectObjects(interactables);
             if (checkIntersects.length > 0 && !isPaused) {
                 document.body.style.cursor = 'pointer';
-                const data = checkIntersects[0].object.userData;
-                tooltipEl.style.display = 'block';
-                tooltipEl.style.left = (mouseX + 15) + 'px';
-                tooltipEl.style.top = (mouseY + 15) + 'px';
+                let data = checkIntersects[0].object.userData;
+                // Skip tooltip for neg if toggle is off
+                if (!showNegative && data.type === 'NegativePrime') {} 
+                else {
+                    tooltipEl.style.display = 'block';
+                    tooltipEl.style.left = (mouseX + 15) + 'px';
+                    tooltipEl.style.top = (mouseY + 15) + 'px';
 
-                if (data.type === 'Prime') {
-                    tooltipEl.innerHTML = `<strong class="highlight-prime">Tension Anchor Node: ${data.val > 1e6 ? data.val.toExponential(4) : data.val}</strong><hr><span style="color:#00ff00; font-weight:bold;">CLICK TO RUN ALGEBRAIC PROOF</span>`;
-                } else {
-                    tooltipEl.innerHTML = `<span class="highlight-zero">${data.val}</span><hr>Click to verify invariant law.`;
+                    if (data.type === 'Prime') {
+                        tooltipEl.innerHTML = `<strong class="highlight-prime">Tension Anchor Node: ${data.val > 1e6 ? data.val.toExponential(4) : data.val}</strong>`;
+                    } else if (data.type === 'NegativePrime') {
+                        tooltipEl.innerHTML = `<strong style="color:#ff00ff;">Negative Parity Node: ${data.val > 1e6 ? data.val.toExponential(4) : data.val}</strong>`;
+                    } else {
+                        tooltipEl.innerHTML = `<span class="highlight-zero">${data.val}</span>`;
+                    }
                 }
             } else {
                 document.body.style.cursor = 'default';
