@@ -432,10 +432,13 @@
             
             const cScale = Math.max(3.0, x_cursor / 100.0); 
             const raw_R = x_cursor / cScale;
+            // The Singularity Pinch: Force radius to 0 at the exact center of the gap (P_progress = 0.5)
+            const pinch = Math.abs((P_progress - 0.5) * 2.0);
+            const pinched_R = raw_R * pinch;
             
-            const X = raw_R * Math.cos(theta);
-            const Y = raw_R * Math.cos(theta) * Math.sin(theta / 2.0); 
-            const Z = raw_R * Math.sin(theta);
+            const X = pinched_R * Math.cos(theta);
+            const Y = pinched_R * Math.cos(theta) * Math.sin(theta / 2.0); 
+            const Z = pinched_R * Math.sin(theta);
 
             // Log Exact N value for continuous tooltips
             traceNValues[pathIdx] = x_cursor;
