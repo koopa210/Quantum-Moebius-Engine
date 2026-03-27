@@ -477,7 +477,11 @@
         btnZoom.onclick = () => { autoFrame = !autoFrame; btnZoom.innerText = autoFrame ? "Auto-Frame: ON" : "Auto-Frame: OFF (Manual)"; btnZoom.style.background = autoFrame ? "#00ff00" : "#555"; btnZoom.style.color = autoFrame ? "#000" : "#00ffff"; };
 
         let isPaused = false;
-        document.getElementById('btn-play').onclick = (e) => { isPaused = !isPaused; e.target.innerText = isPaused ? "Play" : "Pause"; };
+        document.getElementById('btn-play').onclick = (e) => { 
+            isPaused = !isPaused; 
+            e.target.innerText = isPaused ? "Play" : "Pause"; 
+            controls.autoRotate = !isPaused;
+        };
 
         function animate(time) {
             requestAnimationFrame(animate);
