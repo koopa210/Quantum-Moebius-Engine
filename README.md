@@ -14,19 +14,27 @@ We propose that the Prime Numbers and the Riemann Zeros operate as dual geometri
 
 This engine operates with **zero predefined knowledge** of the Prime Numbers. It natively generates them dynamically using only the constants of the universe.
 
-1.  **The Inputs:** The only variables driving the trace are the established imaginary frequencies of the first 40 true Riemann Zeros ($\gamma = 14.13, 21.02, \dots$) and the Prime Probability Integral ($Li(x)$).
-2.  **The Physics:** As time ($x$) advances, the engine calculates the pure Fourier wave interference of those 40 frequencies and maps them to a parametric Möbius coordinate system.
-3.  **The Result:** The continuous mathematical wave flawlessly cascades into complete destructive interference straight through the absolute $(0,0,0)$ Topological Center, and autonomously generates maximum physical peaks at the exact intervals of the Prime Numbers ($2, 3, 5, 7\dots$).
+1.  **The Inputs:** The only variables driving the trace are the established imaginary frequencies of the first 30 true Riemann Zeros ($\gamma = 14.13, 21.02, \dots$) and the Prime Probability Integral ($Li(x)$).
+2.  **The Physics:** As time ($x$) advances, the engine calculates the pure continuous Fourier wave interference of those 30 frequencies and maps them to a parametric Möbius coordinate system.
+3.  **The Result:** The continuous mathematical wave flawlessly cascades into complete destructive interference straight through the absolute $(0,0,0)$ Topological Center, and autonomously generates maximum physical peaks exactly at Prime Structural boundaries.
 
-### Infinite Scale Testing
-
-The engine features an asynchronous $O(1)$ Asymptotic Integrator, allowing it to bypass 64-bit hardware floating-point constraints and calculate the geometric topography for extraordinarily massive numbers (e.g., $10^{100}$). This proves that the topological wave remains perfectly coherent regardless of numerical depth.
+### Diagnostic Multiverse Telemetry HUD
+To enforce scientific rigidity and prove the manifold physically corrects itself to avoid buffer overflows, the engine features real-time diagnostics on the interface:
+1. **Curvature Heat Map:** Geometrically structures tension. High resonance (Red/Orange) reliably plots precise Prime boundaries, while momentum drains map to the strict Origin line (Cyan/Blue).
+2. **Fourier Power Spectrum (EQ):** Identifies the explicit Harmonic Resonance constants dynamically adjusting.
+3. **Parity Steadiness Indicator:** Visualizes the engine's inherent capability to physically torque its geometry back to the absolute 0.5000 invariant.
+4. **Poincaré Attractor Map:** Proves invariant topological stability by charting a rigorous 2D cross-section of the momentum trajectory, ultimately resolving into a rigid circular attractor orbit surrounding the singularity plane.
+5. **Cosmological Teleporter:** Enables the math to be evaluated manually to absolute celestial depths (e.g., $10^{150}$) bypassing 64-bit hardware floating-point failures.
 
 ## Running the Engine
 
 1. Clone this repository.
-2. Open `index.html` in any modern WebGL-supported browser.
-3. Use the interface to "Teleport Math" to arbitrarily massive numbers to test the topological stability of the equations.
+2. Open `index.html` in any modern WebGL-supported browser (or view via GitHub Pages).
+3. Use the interface to physically "Stress Test" the mathematics to arbitrarily massive cosmological numbers to verify the topological stability of the equations.
 
-### Author
-*Algorithm and Theoretical Architecture developed by Jerry.*
+---
+### Author & Academic Contact
+**Jerry Martinez**
+*Theoretical Architecture & Engine Developer*
+Contact: [martinez.jj86@gmail.com](mailto:martinez.jj86@gmail.com)
+Publication Date: March 2026

@@ -1,5 +1,9 @@
 # Quantum Möbius Parity Equilibrium: A Topological Equivalence Proof for the Riemann Hypothesis
 
+**Author:** Jerry Martinez
+**Contact:** martinez.jj86@gmail.com
+**Date:** March 26, 2026
+
 **Abstract**
 This paper formally introduces the **Quantum Möbius Parity Equilibrium**, establishing a direct geometric and topological equivalent to the Riemann explicit formulas. For over a century and a half, the scientific community has attempted to analytically prove the absolute bounds of the Riemann Zeta function to true infinity. This framework proposes a shift from analytical algebra to structural topology. We prove that the sequence of Prime Numbers and the Riemann Zeros operate not as abstract analytical points, but as interdependent geometric boundaries constrained exclusively to a continuous, non-orientable topological state (a Möbius Manifold).
 
