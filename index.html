@@ -44,7 +44,7 @@
         @keyframes glitch { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
 
         /* ANALYSIS PANEL */
-        #tooltip { position: absolute; background: rgba(0,20,40,0.95); border: 1px solid #ff4400; color: #fff; padding: 10px 14px; border-radius: 5px; pointer-events: none; display: none; z-index: 100; font-family: monospace; font-size: 13px; box-shadow: 0 4px 12px rgba(255,68,0,0.3); }
+        #tooltip { position: absolute; background: rgba(0,20,40,0.95); border: 1px solid #ff4400; color: #fff; padding: 10px 14px; border-radius: 5px; pointer-events: none; display: none; z-index: 100; font-family: monospace; font-size: 13px; box-shadow: 0 4px 12px rgba(255,68,0,0.3); white-space: nowrap;}
         hr { border-color: rgba(255,255,255,0.2); margin: 6px 0; }
 
         #data-panel { position: absolute; right: 360px; top: 20px; width: 340px; background: rgba(0,25,40,0.95); border: 1px solid #ff4400; padding: 20px; border-radius: 8px; display: none; box-shadow: 0 0 20px rgba(255,68,0,0.3); z-index: 50; overflow-y:auto; max-height:80vh; pointer-events: auto;}
@@ -171,8 +171,11 @@
         interactables.push(singularityMesh);
         scene.add(new THREE.PointLight(0x00ffff, 2, 50));
 
-        // Positive Tracing
+        // Line Vertex Memory For Continuous Tooltips
         const traceMaxPts = 500000; 
+        const traceNValues = new Float32Array(traceMaxPts); 
+
+        // Positive Tracing
         const tracePositions = new Float32Array(traceMaxPts * 3);
         const traceColors = new Float32Array(traceMaxPts * 3);
         const traceGeo = new THREE.BufferGeometry();
@@ -181,7 +184,9 @@
         traceGeo.setDrawRange(0, 0);
         const traceMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, linewidth: 2 });
         const traceLine = new THREE.Line(traceGeo, traceMat);
+        traceLine.userData = { type: 'PosLine' };
         scene.add(traceLine);
+        interactables.push(traceLine); // Make line scrubbable
 
         // Negative Tracing (Symmetrical)
         let showNegative = false;
@@ -193,12 +198,19 @@
         traceNegGeo.setDrawRange(0, 0);
         const traceNegMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, linewidth: 2 });
         const traceNegLine = new THREE.Line(traceNegGeo, traceNegMat);
+        traceNegLine.userData = { type: 'NegLine' };
         scene.add(traceNegLine);
         traceNegLine.visible = false;
+        interactables.push(traceNegLine); // Make line scrubbable
 
+        // Adjust raycaster line threshold so mouse doesn't have to be perfectly on the invisible 1px vector
+        const raycaster = new THREE.Raycaster();
+        raycaster.params.Line.threshold = 0.3; 
+        const mouse = new THREE.Vector2();
+        let mouseX = 0, mouseY = 0;
+        
         const primesGroup = new THREE.Group();
         scene.add(primesGroup);
-
         const primesNegGroup = new THREE.Group();
         scene.add(primesNegGroup);
         primesNegGroup.visible = false;
@@ -222,9 +234,6 @@
             legTitle.innerText = showNegative ? "Structure Legend (Dual)" : "Structure Legend (Positive)";
         };
 
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let mouseX = 0, mouseY = 0;
         const tooltipEl = document.getElementById('tooltip');
         const dataPanel = document.getElementById('data-panel');
         const dataContent = document.getElementById('data-content');
@@ -234,15 +243,18 @@
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             mouseX = event.clientX;
             mouseY = event.clientY;
-            controls.autoRotateSpeed = 0.2;
+            controls.autoRotateSpeed = 0.1;
         });
 
         window.addEventListener('click', () => {
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(interactables);
-            if (intersects.length > 0) {
-                const data = intersects[0].object.userData;
-                
+            
+            // Filter to only click Spheres (Zero or Primes) to bring up the full side panel
+            const objHit = intersects.find(i => i.object.userData.type === 'Zero' || i.object.userData.type === 'Prime' || i.object.userData.type === 'NegativePrime');
+            
+            if (objHit) {
+                const data = objHit.object.userData;
                 if (data.type === 'Zero') {
                     dataContent.innerHTML = `
                         <strong>Target:</strong> ${data.val}<br>
@@ -331,7 +343,12 @@
 
             while(primesGroup.children.length > 0) primesGroup.remove(primesGroup.children[0]);
             while(primesNegGroup.children.length > 0) primesNegGroup.remove(primesNegGroup.children[0]);
-            interactables.length = 1; 
+            
+            // clear dynamic arrays but keep base ones
+            interactables.length = 0; 
+            interactables.push(singularityMesh);
+            interactables.push(traceLine);
+            interactables.push(traceNegLine);
             
             const dots = document.querySelectorAll('.poincare-dot');
             dots.forEach(d => d.remove());
@@ -365,7 +382,7 @@
                 const pTh = Math.PI * prime_k_index;
                 
                 // Positive Anchor
-                const node = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.5, 0.5 + rR/100)), new THREE.MeshBasicMaterial({ color: 0xff4400 }));
+                const node = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.6, 0.6 + rR/100)), new THREE.MeshBasicMaterial({ color: 0xff4400 }));
                 const pX = rR * Math.cos(pTh); const pY = rR * Math.cos(pTh) * Math.sin(pTh / 2.0); const pZ = rR * Math.sin(pTh);
                 node.position.set(pX, pY, pZ);
                 
@@ -376,7 +393,7 @@
                 primesGroup.add(node);
 
                 // Negative Parity Anchor (Magenta)
-                const negNode = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.5, 0.5 + rR/100)), new THREE.MeshBasicMaterial({ color: 0xff00ff }));
+                const negNode = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.6, 0.6 + rR/100)), new THREE.MeshBasicMaterial({ color: 0xff00ff }));
                 negNode.position.set(-pX, -pY, -pZ);
                 negNode.userData = { type: 'NegativePrime', val: -p_k, gap: gapStr, k: prime_k_index, theta: pTh };
                 interactables.push(negNode);
@@ -395,6 +412,9 @@
             const X = raw_R * Math.cos(theta);
             const Y = raw_R * Math.cos(theta) * Math.sin(theta / 2.0); 
             const Z = raw_R * Math.sin(theta);
+
+            // Log Exact N value for continuous tooltips
+            traceNValues[pathIdx] = x_cursor;
 
             // Positive Log
             tracePositions[pathIdx * 3] = X; tracePositions[pathIdx * 3 + 1] = Y; tracePositions[pathIdx * 3 + 2] = Z;
@@ -465,12 +485,25 @@
 
             raycaster.setFromCamera(mouse, camera);
             const checkIntersects = raycaster.intersectObjects(interactables);
+            
             if (checkIntersects.length > 0 && !isPaused) {
-                document.body.style.cursor = 'pointer';
-                let data = checkIntersects[0].object.userData;
-                // Skip tooltip for neg if toggle is off
-                if (!showNegative && data.type === 'NegativePrime') {} 
-                else {
+                // Find top intersection to prioritize Spheres over Lines if they overlap
+                let hitIdx = 0;
+                for(let i=0; i<checkIntersects.length; i++) {
+                    if (checkIntersects[i].object.userData.type === 'Prime' || checkIntersects[i].object.userData.type === 'NegativePrime' || checkIntersects[i].object.userData.type === 'Zero') {
+                        hitIdx = i; break;
+                    }
+                }
+                
+                let obj = checkIntersects[hitIdx].object;
+                let data = obj.userData;
+                let hitVertexIdx = checkIntersects[hitIdx].index;
+
+                if (!showNegative && (data.type === 'NegativePrime' || data.type === 'NegLine')) {
+                    tooltipEl.style.display = 'none';
+                    document.body.style.cursor = 'default';
+                } else {
+                    document.body.style.cursor = 'pointer';
                     tooltipEl.style.display = 'block';
                     tooltipEl.style.left = (mouseX + 15) + 'px';
                     tooltipEl.style.top = (mouseY + 15) + 'px';
@@ -479,8 +512,22 @@
                         tooltipEl.innerHTML = `<strong class="highlight-prime">Tension Anchor Node: ${data.val > 1e6 ? data.val.toExponential(4) : data.val}</strong>`;
                     } else if (data.type === 'NegativePrime') {
                         tooltipEl.innerHTML = `<strong style="color:#ff00ff;">Negative Parity Node: ${data.val > 1e6 ? data.val.toExponential(4) : data.val}</strong>`;
-                    } else {
+                    } else if (data.type === 'Zero') {
                         tooltipEl.innerHTML = `<span class="highlight-zero">${data.val}</span>`;
+                    } else if (data.type === 'PosLine' && hitVertexIdx !== undefined) {
+                        const rawN = traceNValues[hitVertexIdx];
+                        tooltipEl.innerHTML = `
+                            <strong style="color:#00ffff;">Continuous Wave Tracer</strong><hr>
+                            <strong>Coordinate (n): <span>${rawN > 1e6 ? rawN.toExponential(4) : rawN.toFixed(4)}</span></strong><br>
+                            <span style="color:#00ff00;">&Sigma; cos(&gamma; &middot; ln(|n|))</span>
+                        `;
+                    } else if (data.type === 'NegLine' && hitVertexIdx !== undefined) {
+                        const rawN = -traceNValues[hitVertexIdx];
+                        tooltipEl.innerHTML = `
+                            <strong style="color:#ff00ff;">Negative Wave Tracer</strong><hr>
+                            <strong>Coordinate (n): <span>${rawN < -1e6 ? rawN.toExponential(4) : rawN.toFixed(4)}</span></strong><br>
+                            <span style="color:#00ff00;">&Sigma; cos(&gamma; &middot; ln(|n|))</span>
+                        `;
                     }
                 }
             } else {
