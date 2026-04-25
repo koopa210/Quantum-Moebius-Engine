@@ -12,11 +12,18 @@ We propose that the Prime Numbers and the Riemann Zeros operate as dual geometri
 
 ## The Simulation Architecture
 
-This engine operates with **zero predefined knowledge** of the Prime Numbers. It natively generates them dynamically using only the constants of the universe.
+This engine operates with **zero predefined knowledge** of the Prime Numbers. It represents a process of **Emergence**: the dynamic construction of primes through the interaction of pure mathematical constants.
 
-1.  **The Inputs:** The only variables driving the trace are the established imaginary frequencies of the first 30 true Riemann Zeros ($\gamma = 14.13, 21.02, \dots$) and the Prime Probability Integral ($Li(x)$).
-2.  **The Physics:** As time ($x$) advances, the engine calculates the pure continuous Fourier wave interference of those 30 frequencies and maps them to a parametric Möbius coordinate system.
-3.  **The Result:** The continuous mathematical wave flawlessly cascades into complete destructive interference straight through the absolute $(0,0,0)$ Topological Center, and autonomously generates maximum physical peaks exactly at Prime Structural boundaries.
+1.  **The Inputs (Building Materials):** The only variables driving the trace are the established imaginary frequencies of the first 30 true Riemann Zeros ($\gamma = 14.13, 21.02, \dots$) and the Prime Probability Integral ($Li(x)$). We treat these formulas as the "input energy" of the system.
+2.  **The Physics:** As time ($x$) advances, the engine calculates the pure continuous Fourier wave interference and maps it to a parametric Möbius coordinate system.
+3.  **The Result:** The interaction between the Möbius manifold (the System) and the Riemann Zeros (the Energy) results in the emergence of Primes. The wave flawlessly cascades through the absolute $(0,0,0)$ Topological Center, generating physical peaks exactly at Prime boundaries.
+
+### Technical Mapping: From Code to Complex Analysis
+To provide rigour for the "Complex Analysis" community, the simulation coordinates map directly to the Riemann Zeta function as follows:
+*   **$x$-Axis:** Represents the imaginary axis ($t$) of the Zeta function.
+*   **$Y=0$:** Represents the **Critical Line** ($Re(s) = 1/2$).
+*   **Zero Deviation:** The Möbius equation $Y = R \cdot \cos(\theta) \cdot \sin(\theta/2)$ forces $Y$ to zero at the manifold twist. Any deviation from the critical line would require a physically impossible "untwisting" of the manifold.
+*   **Red Tension:** High resonance peaks occur where the Fourier sum reaches a maximum that the manifold cannot dissipate, manifesting as Prime singularities.
 
 ### Diagnostic Multiverse Telemetry HUD
 To enforce scientific rigidity and prove the manifold physically corrects itself to avoid buffer overflows, the engine features real-time diagnostics on the interface:
