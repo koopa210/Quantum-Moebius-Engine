@@ -1,6 +1,5 @@
 # Quantum Möbius Parity Equilibrium Engine
-
-This repository hosts a formal, interactive 3D physics engine designed to demonstrate a **Topological Equivalence Proof** for the Riemann Hypothesis.
+**Foundational Ground-State of the Unified Topological Field Theory (UTF-T)**
 
 ## The Topological Theorem
 
