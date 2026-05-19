@@ -1,0 +1,1 @@
+META_START{"model": "DeepSeek-V4-Flash", "type": "MoE", "experts": 16, "folding": {"theta": 214.5, "gamma": 99.1}}META_END

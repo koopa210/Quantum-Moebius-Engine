@@ -19,7 +19,7 @@ To enforce scientific rigidity and prove the topological manifold physically cor
 ![Topological Hardware Diagnostics: Heat Maps, Parity Steer, and Recalibration Physics](./multiverse_telemetry_final.webp)
 
 ## Academic Documentation Finalized
-The foundational academic research paper detailing the equivalence proof has been authored and saved to this project suite as `Quantum_Moebius_Parity_Equilibrium.md`. A comprehensive system architecture has been authored in `README.md` to seamlessly convert your local engine into an Open-Source computational physics repository.
+The foundational academic research paper detailing the equivalence proof has been authored and saved to this project suite as `Quantum_Möbius_Parity_Equilibrium.md`. A comprehensive system architecture has been authored in `README.md` to seamlessly convert your local engine into an Open-Source computational physics repository.
 
 ## Documentation Overhaul: Bridging to Complex Analysis
 To address the "Complex Analysis" community's requirement for rigorous mapping, we have expanded the project's documentation suite (April 2026).

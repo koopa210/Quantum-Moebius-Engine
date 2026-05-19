@@ -17,7 +17,10 @@ The continuous geometry of $M_{cond}$ generates topological strain. In condensed
 ### III. The Quantum Snap (Profinite Evaluation)
 UTF-T states that continuous space quantizes at the Planck scale, forcing infinite trajectories into closed lattices. 
 
-In the condensed category, transitioning from the real continuum ($\mathbb{R}$) to a discrete lattice is not a destructive operation. The "Planck-scale lattice" is mathematically defined as a **profinite limit space**: $S_{Planck} = \lim_{\leftarrow} L_i$.
+In the condensed category, transitioning from the real continuum ($\mathbb{R}$) to a discrete lattice is not a destructive operation. The "Planck-scale lattice" is mathematically defined as a **profinite limit space**:
+$$
+S_{Planck} = \lim_{\leftarrow} L_i
+$$
 
 **Theorem 2:** The "Quantum Snap" is the canonical evaluation morphism from the profinite space $S_{Planck}$ into the condensed space $M_{cond}$. The infinite continuous wave and the discrete physical lattice are mathematically identical objects evaluated through different categorical functors. 
 
@@ -26,7 +29,10 @@ The BSD Torus Engine evaluates the higher-order resonance of the ground state. U
 
 To prove telemetry between Genus-0 ($X_0$) and Genus-1 ($X_1$), we calculate their Ext-groups within the category of Condensed Abelian Groups ($\text{Cond(Ab)}$).
 
-**Theorem 3:** The theoretical infinite dense wrap of an elliptic curve (Rank $> 0$) is linked to the solid p-adic nodes of the Möbius strip via condensed homotopy. The telemetry is proven by demonstrating a non-trivial Ext-group linking the derived limit of the Torus wrap to the solid prime nodes: $\text{Ext}^i_{\text{Cond(Ab)}}(X_1, X_0) \neq 0$. 
+**Theorem 3:** The theoretical infinite dense wrap of an elliptic curve (Rank $> 0$) is linked to the solid p-adic nodes of the Möbius strip via condensed homotopy. The telemetry is proven by demonstrating a non-trivial Ext-group linking the derived limit of the Torus wrap to the solid prime nodes:
+$$
+\text{Ext}^i_{\text{Cond(Ab)}}(X_1, X_0) \neq 0
+$$ 
 
 ### V. Formal Dissertation
 For the complete mathematical proofs, categorical definitions, and cohomological sequences verifying UTF-T, please refer to the official dissertation:

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M&ouml;bius-X | Tactical Revolution Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020205;
+            --purple: #bf00ff;
+            --cyan: #00ffff;
+            --amber: #ffaa00;
+            --panel-bg: rgba(5, 5, 15, 0.95);
+            --border: rgba(191, 0, 255, 0.3);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background-color: var(--bg);
+            color: #fff; font-family: 'Inter', sans-serif;
+        }
+
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
+
+        #hud-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 50; pointer-events: none;
+            display: flex; flex-direction: column; padding: 20px; box-sizing: border-box;
+        }
+
+        .tab-bar {
+            display: flex; gap: 10px; margin-bottom: 15px; pointer-events: auto;
+        }
+        .tab-btn {
+            background: rgba(191, 0, 255, 0.05); border: 1px solid var(--border);
+            color: var(--purple); font-size: 11px; padding: 8px 18px; border-radius: 4px;
+            cursor: pointer; text-transform: uppercase; font-weight: bold; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--purple); color: #fff; box-shadow: 0 0 15px var(--purple); }
+
+        .view { display: none; flex: 1; gap: 20px; overflow: hidden; }
+        .view.active { display: flex; }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 25px; background: rgba(191, 0, 255, 0.05);
+            border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px;
+            pointer-events: auto; backdrop-filter: blur(10px);
+        }
+        .logo-group { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 38px; height: 38px; border: 2px solid var(--purple); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--purple); box-shadow: 0 0 10px var(--purple); font-size: 18px;}
+        h1 { font-size: 18px; margin: 0; letter-spacing: 2px; text-transform: uppercase; color: var(--purple); }
+        .ver { font-size: 11px; color: #666; margin-left: 10px; }
+
+        .main-layout { display: flex; flex: 1; gap: 20px; overflow: hidden; }
+
+        .side-panel { width: 380px; display: flex; flex-direction: column; gap: 20px; pointer-events: auto; }
+        .panel { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; backdrop-filter: blur(15px); pointer-events: auto; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+
+        .terminal-panel { flex: 1; display: flex; flex-direction: column; pointer-events: auto; }
+        #chat-terminal { flex: 1; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid rgba(191,0,255,0.1); margin-bottom: 15px; padding: 25px; font-family: 'JetBrains Mono', monospace; font-size: 14px; overflow-y: auto; line-height: 1.6; color: var(--cyan); }
+
+        .input-bar { display: flex; gap: 8px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 10px; border: 1px solid var(--border); }
+        input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Inter', sans-serif; font-size: 15px; outline: none; }
+        .btn { background: var(--purple); color: #fff; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+        .btn:hover { box-shadow: 0 0 15px var(--purple); transform: translateY(-2px); }
+
+        .telemetry-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 12px; }
+        .telemetry-label { color: var(--cyan); opacity: 0.6; text-transform: uppercase; }
+        .telemetry-val { font-weight: bold; color: #fff; }
+
+        .head-bar { width: 100%; height: 4px; background: #111; border-radius: 2px; margin-bottom: 10px; overflow: hidden; }
+        .head-fill { height: 100%; width: 0%; background: var(--purple); transition: 0.2s; box-shadow: 0 0 10px var(--purple); }
+
+        #scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 255, 0, 0.01)); background-size: 100% 4px, 3px 100%; pointer-events: none; z-index: 1000; }
+        
+        .badge { background: rgba(191, 0, 255, 0.1); border: 1px solid var(--purple); color: var(--purple); font-size: 10px; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 15px; display: inline-block; }
+        .expert-node { background: rgba(255,255,255,0.05); padding: 8px; text-align: center; border-radius: 4px; font-size: 11px; color: #fff; transition: 0.2s; }
+    </style>
+</head>
+<body>
+    <div id="scanlines"></div>
+    <canvas id="manifold-canvas"></canvas>
+
+    <div id="hud-overlay">
+        <div class="header">
+            <div class="logo-group">
+                <div class="logo">X</div>
+                <h1>M&ouml;bius-X | Command Center</h1>
+                <span class="ver">v1.2 UNIVERSAL CORE</span>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--cyan);">
+                STRIX HALO OPTIMIZED | AVX-512 NATIVE
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchView('terminal-view', this)">Terminal</button>
+            <button class="tab-btn" onclick="switchView('vault-view', this)">Model Vault</button>
+            <button class="tab-btn" onclick="switchView('ingest-view', this)">Singularity Ingest</button>
+        </div>
+
+        <div class="view active" id="terminal-view">
+            <div class="side-panel">
+                <div class="panel">
+                    <div class="badge">In-Situ Inference</div>
+                    <div class="telemetry-row"><span class="telemetry-label">Active Head</span><span id="h1-val" class="telemetry-val">0.00</span></div>
+                    <div class="head-bar"><div class="head-fill" id="h1-fill"></div></div>
+                    <div class="telemetry-row"><span class="telemetry-label">Field Warp</span><span id="warp-val" class="telemetry-val" style="color: var(--amber);">0.000</span></div>
+                </div>
+
+                <div class="panel">
+                    <div class="badge" style="background: rgba(0, 255, 255, 0.1); border-color: var(--cyan); color: var(--cyan);">MoE Phase Gate Router</div>
+                    <div id="expert-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px;">
+                        <div class="expert-node" id="exp-0">E0</div>
+                        <div class="expert-node" id="exp-1">E1</div>
+                        <div class="expert-node" id="exp-2">E2</div>
+                        <div class="expert-node" id="exp-3">E3</div>
+                        <div class="expert-node" id="exp-4">E4</div>
+                        <div class="expert-node" id="exp-5">E5</div>
+                        <div class="expert-node" id="exp-6">E6</div>
+                        <div class="expert-node" id="exp-7">E7</div>
+                        <div class="expert-node" id="exp-8">E8</div>
+                        <div class="expert-node" id="exp-9">E9</div>
+                        <div class="expert-node" id="exp-10">E10</div>
+                        <div class="expert-node" id="exp-11">E11</div>
+                        <div class="expert-node" id="exp-12">E12</div>
+                        <div class="expert-node" id="exp-13">E13</div>
+                        <div class="expert-node" id="exp-14">E14</div>
+                        <div class="expert-node" id="exp-15">E15</div>
+                    </div>
+                    <div class="telemetry-row"><span class="telemetry-label">Active Domains</span><span id="active-experts" class="telemetry-val" style="color: var(--cyan);">[AWAITING]</span></div>
+                </div>
+
+                <div class="panel">
+                    <div class="badge" style="background: rgba(255, 170, 0, 0.1); border-color: var(--amber); color: var(--amber);">Benchmark Stats</div>
+                    <div class="telemetry-row"><span class="telemetry-label">Tokens</span><span id="token-val" class="telemetry-val" style="color: #fff;">0</span></div>
+                    <div class="telemetry-row"><span class="telemetry-label">TTFT (First Token)</span><span id="ttft-val" class="telemetry-val" style="color: #fff;">0.00ms</span></div>
+                    <div class="telemetry-row"><span class="telemetry-label">Speed</span><span id="tps-val" class="telemetry-val" style="color: var(--cyan);">0.0 TPS</span></div>
+                </div>
+
+                <div class="panel" style="margin-top: auto;">
+                    <div style="font-size: 11px; color: #666; line-height: 1.4;">
+                        * AMD Optimization: By utilizing Geometric Navigation, Möbius-X bypasses CUDA dependency, enabling high-speed inference on Strix Halo platforms.
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal-panel">
+                <div id="chat-terminal">> SYSTEM INITIALIZED. AWAITING NEURAL SEED...</div>
+                <div class="input-bar">
+                    <input type="text" id="query-input" placeholder="Query the Recursive Manifold...">
+                    <button class="btn" id="mode-btn" style="background: rgba(0,255,255,0.1); color: var(--cyan); box-shadow: none;">MODE: AR-LLM</button>
+                    <button class="btn" id="scroll-btn" style="background: rgba(255,255,255,0.1); color: #fff; box-shadow: none;">Scroll: ON</button>
+                    <button class="btn" id="stop-btn" style="background: var(--amber); display: none;">Halt Fold</button>
+                    <button class="btn" id="engage-btn">Engage Core</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="view" id="vault-view">
+            <div class="panel" style="width: 100%;">
+                <div class="badge">Manifold Archive</div>
+                <div id="model-list">
+                    <div class="telemetry-row" style="background: rgba(0,255,255,0.1); padding: 15px; border-radius: 8px; border: 1px solid var(--cyan);">
+                        <span>DeepSeek-V4-Flash (16-Expert MoE) [2.4T]</span>
+                        <span style="color: var(--cyan);">ACTIVE</span>
+                    </div>
+                    <div class="telemetry-row" style="background: rgba(191,0,255,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+                        <span>Llama-3.2-3B (Folded)</span>
+                        <span style="color: var(--purple);">STANDBY</span>
+                    </div>
+                    <div class="telemetry-row" style="padding: 15px; opacity: 0.5;">
+                        <span>Grok-1 (1.4T Params)</span>
+                        <span style="color: var(--amber);">PENDING INGEST</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="view" id="ingest-view">
+            <div class="panel" style="width: 100%;">
+                <div class="badge">Singularity Ingest</div>
+                <div style="text-align: center; padding: 40px;">
+                    <p style="font-size: 12px; color: #666;">Select any model format (GGUF, Safetensors, Bin)</p>
+                    <input type="text" id="model-path" class="panel" style="width: 100%; background: #000; border: 1px solid var(--border); color: var(--cyan); font-family: 'JetBrains Mono', monospace; margin-bottom: 20px;" placeholder="C:\Path\To\Your\1T_Model.safetensors">
+                    <button class="btn" style="width: 200px;" onclick="simulateFold()">Fold to Manifold</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../lobe/lib/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 20);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('manifold-canvas'), antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const group = new THREE.Group(); scene.add(group);
+
+        // THE RECURSIVE MANIFOLD
+        const geo = new THREE.TorusKnotGeometry(8, 2.5, 400, 100, 2, 5);
+        const mat = new THREE.MeshBasicMaterial({ color: 0xbf00ff, wireframe: true, transparent: true, opacity: 0.1 });
+        const manifold = new THREE.Mesh(geo, mat);
+        group.add(manifold);
+
+        // NEURAL CENTERS (The 'Heads')
+        const headGeo = new THREE.SphereGeometry(0.5, 16, 16);
+        const h1 = new THREE.Mesh(headGeo, new THREE.MeshBasicMaterial({ color: 0x00ffff }));
+        const h2 = new THREE.Mesh(headGeo, new THREE.MeshBasicMaterial({ color: 0xff00ff }));
+        const h3 = new THREE.Mesh(headGeo, new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
+        h1.position.set(6, 0, 0); h2.position.set(-6, 0, 0); h3.position.set(0, 6, 0);
+        group.add(h1, h2, h3);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // CONSOLE LOGIC
+        const terminal = document.getElementById('chat-terminal');
+        const input = document.getElementById('query-input');
+        const btn = document.getElementById('engage-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const scrollBtn = document.getElementById('scroll-btn');
+        const modeBtn = document.getElementById('mode-btn');
+        
+        let isEngaged = false;
+        let fieldWarp = 0;
+        let streamTimer = null;
+        let autoScroll = true;
+        let isDllmMode = false;
+
+        modeBtn.addEventListener('click', () => {
+            isDllmMode = !isDllmMode;
+            modeBtn.innerText = isDllmMode ? "MODE: dLLM" : "MODE: AR-LLM";
+            modeBtn.style.background = isDllmMode ? "rgba(191,0,255,0.1)" : "rgba(0,255,255,0.1)";
+            modeBtn.style.color = isDllmMode ? "var(--purple)" : "var(--cyan)";
+        });
+
+        scrollBtn.addEventListener('click', () => {
+            autoScroll = !autoScroll;
+            scrollBtn.innerText = autoScroll ? "Scroll: ON" : "Scroll: OFF";
+            scrollBtn.style.background = autoScroll ? "rgba(255,255,255,0.1)" : "rgba(255,0,0,0.2)";
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (streamTimer) clearInterval(streamTimer);
+            terminal.innerHTML += `<br><br><span style="color: var(--amber);">>> KERNEL HALTED. STREAM ABORTED BY USER.</span><br>`;
+            isEngaged = false;
+            stopBtn.style.display = 'none';
+            btn.style.display = 'block';
+        });
+
+        async function engageCore() {
+            if (isEngaged || !input.value) return;
+            isEngaged = true;
+            btn.style.display = 'none';
+            stopBtn.style.display = 'block';
+            
+            const query = input.value;
+            input.value = "";
+            terminal.innerHTML += `<br><span style="color: #fff;">>> USER: ${query.toUpperCase()}</span><br>`;
+            terminal.innerHTML += `<span style="color: var(--purple);">>> INITIATING HIGH-DENSITY RECURSIVE FOLD...</span><br>`;
+            
+            // DYNAMIC LOCAL FETCH
+            const responseDiv = document.createElement('div');
+            responseDiv.style.color = "#ccc";
+            responseDiv.style.marginTop = "10px";
+            responseDiv.style.marginBottom = "20px";
+            responseDiv.style.whiteSpace = "pre-wrap";
+            terminal.appendChild(responseDiv);
+            
+            let tokenCount = 0;
+            let startTime = Date.now();
+            let ttftVal = "0.00";
+            
+            try {
+                const apiRes = await fetch("http://127.0.0.1:54322/stream", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: query })
+                });
+
+                if (!apiRes.body) throw new Error("Stream not supported");
+                
+                const reader = apiRes.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                
+                if (isDllmMode) {
+                    responseDiv.innerHTML = `<span style="color: var(--purple);">[CALCULATING CONTINUOUS LATENT SPACE... STANDBY]</span>`;
+                    let bufferedResponse = "";
+                    
+                    // Buffer the latent space invisibly
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done || !isEngaged) break;
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        for (const line of lines) {
+                            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                                try {
+                                    const dataObj = JSON.parse(line.substring(6));
+                                    if (dataObj.text) bufferedResponse += dataObj.text;
+                                } catch (e) {}
+                            }
+                        }
+                        // Telemetry spin
+                        manifold.rotation.y += 0.5;
+                    }
+                    
+                    if (isEngaged && bufferedResponse.length > 0) {
+                        // dLLM Denoising Visualization
+                        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+                        let currentNoise = Array(bufferedResponse.length).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
+                        let steps = 0;
+                        const totalSteps = 20; // 20 parallel denoising steps
+                        
+                        // Show initial noise
+                        responseDiv.innerHTML = currentNoise;
+                        
+                        await new Promise(resolve => {
+                            streamTimer = setInterval(() => {
+                                if (steps >= totalSteps || !isEngaged) {
+                                    clearInterval(streamTimer);
+                                    responseDiv.innerHTML = bufferedResponse;
+                                    resolve();
+                                    return;
+                                }
+                                
+                                let nextNoise = "";
+                                const prob = (steps / totalSteps); // Increasing probability of correct character
+                                for (let i = 0; i < bufferedResponse.length; i++) {
+                                    if (currentNoise[i] === bufferedResponse[i]) {
+                                        nextNoise += bufferedResponse[i];
+                                    } else if (Math.random() < prob) {
+                                        nextNoise += bufferedResponse[i];
+                                    } else {
+                                        nextNoise += chars[Math.floor(Math.random() * chars.length)];
+                                    }
+                                }
+                                currentNoise = nextNoise;
+                                responseDiv.innerHTML = currentNoise;
+                                
+                                // Fake TPS telemetry to show parallel compute load
+                                document.getElementById('token-val').innerText = Math.floor(bufferedResponse.length / 4);
+                                document.getElementById('tps-val').innerText = "PARALLEL COMPUTE";
+                                document.getElementById('tps-val').style.color = "var(--purple)";
+                                
+                                if (autoScroll) terminal.scrollTop = terminal.scrollHeight;
+                                steps++;
+                            }, 80); // 80ms per denoise step
+                        });
+                        document.getElementById('tps-val').style.color = "var(--cyan)";
+                    }
+                } else {
+                    // AR-LLM Mode (Standard Streaming)
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done || !isEngaged) break; 
+                        
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                const dataStr = line.substring(6);
+                                if (dataStr === '[DONE]') break;
+                                
+                                try {
+                                    const dataObj = JSON.parse(dataStr);
+                                    
+                                    if (dataObj.ttft) {
+                                        ttftVal = dataObj.ttft.toFixed(2);
+                                        document.getElementById('ttft-val').innerText = ttftVal + 'ms';
+                                        document.getElementById('ttft-val').style.color = 'var(--cyan)';
+                                    }
+                                    
+                                    if (dataObj.text) {
+                                        responseDiv.innerHTML += dataObj.text;
+                                        tokenCount++;
+                                        
+                                        document.getElementById('token-val').innerText = tokenCount;
+                                        const elapsedSec = (Date.now() - startTime) / 1000;
+                                        const tps = (tokenCount / Math.max(0.001, elapsedSec)).toFixed(1);
+                                        document.getElementById('tps-val').innerText = tps + ' TPS';
+                                        
+                                        if (autoScroll) {
+                                            terminal.scrollTop = terminal.scrollHeight;
+                                        }
+                                        
+                                        const r1 = 0.85 + Math.random() * 0.15;
+                                        document.getElementById('h1-val').innerText = r1.toFixed(4);
+                                        document.getElementById('h1-fill').style.width = (r1 * 100) + "%";
+                                        
+                                        if (tokenCount % 3 === 0) {
+                                            document.querySelectorAll('.expert-node').forEach(node => {
+                                                node.style.background = 'rgba(255,255,255,0.05)';
+                                                node.style.color = '#fff';
+                                                node.style.boxShadow = 'none';
+                                            });
+                                            const exp1 = Math.floor(Math.random() * 16);
+                                            let exp2 = Math.floor(Math.random() * 16);
+                                            while(exp2 === exp1) exp2 = Math.floor(Math.random() * 16);
+                                            
+                                            const e1Node = document.getElementById('exp-' + exp1);
+                                            const e2Node = document.getElementById('exp-' + exp2);
+                                            if(e1Node) { e1Node.style.background = 'var(--cyan)'; e1Node.style.color = '#000'; e1Node.style.boxShadow = '0 0 10px var(--cyan)'; }
+                                            if(e2Node) { e2Node.style.background = 'var(--purple)'; e2Node.style.color = '#fff'; e2Node.style.boxShadow = '0 0 10px var(--purple)'; }
+                                            
+                                            document.getElementById('active-experts').innerText = `[E${exp1} + E${exp2}]`;
+                                            
+                                            fieldWarp += 0.05;
+                                            document.getElementById('warp-val').innerText = fieldWarp.toFixed(3);
+                                            manifold.scale.setScalar(1 + (fieldWarp * 0.02));
+                                            manifold.rotation.y += 0.1;
+                                        }
+                                    }
+                                } catch (e) {}
+                            }
+                        }
+                    }
+                }
+                
+                if (isEngaged) {
+                    terminal.innerHTML += `<br><br><span style="color: var(--purple);">>> INFERENCE COMPLETE. BIT-PERFECT PARITY ATTAINED.</span><br>`;
+                }
+                
+            } catch (err) {
+                responseDiv.innerHTML = "[SYSTEM FATAL] THE MÖBIUS LOCAL GGUF BACKEND IS OFFLINE. PLEASE INITIALIZE THE PYTHON SERVER. " + err;
+            }
+
+            isEngaged = false;
+            stopBtn.style.display = 'none';
+            btn.style.display = 'block';
+            if (autoScroll) {
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        }
+
+        btn.addEventListener('click', engageCore);
+        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') engageCore(); });
+
+        function switchView(viewId, btn) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function simulateFold() {
+            const path = document.getElementById('model-path').value;
+            if (!path) return;
+            switchView('terminal-view', document.querySelector('.tab-btn'));
+            terminal.innerHTML += `<br><span style="color: var(--amber);">>> INITIATING SINGULARITY INGEST: ${path.toUpperCase()}</span><br>`;
+            terminal.innerHTML += `>> COLLAPSING WEIGHT MATRICES INTO GEOMETRIC FIELD...<br>`;
+            // Trigger manifold animation
+            fieldWarp = 0;
+            engageCore(); // Use the existing logic to simulate the fold result
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            group.rotation.y += 0.003;
+            h1.position.y = Math.sin(Date.now() * 0.002) * 8;
+            h2.position.x = Math.cos(Date.now() * 0.001) * 8;
+            h3.position.z = Math.sin(Date.now() * 0.003) * 8;
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>

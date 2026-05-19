@@ -101,7 +101,7 @@ class SingularityEngine:
         ax3.set_axis_off()
 
         plt.tight_layout()
-        out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'moebius_singularity.png')
+        out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Möbius_singularity.png')
         plt.savefig(out_path)
         print(f"[+] Saved visualization to {out_path}")
 

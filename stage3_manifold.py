@@ -6,7 +6,7 @@ import os
 RESOLUTION = 200 
 LIMIT = 10000    
 
-def generate_moebius_manifold(n_points):
+def generate_Möbius_manifold(n_points):
     u = np.linspace(0, 2 * np.pi, n_points) 
     v = np.linspace(-1, 1, n_points)      
     u, v = np.meshgrid(u, v)
@@ -18,7 +18,7 @@ def generate_moebius_manifold(n_points):
 
 def run_stage_3():
     print("Generating 3D MÃ¶bius Manifold with Hardware-Tuned Parameters...")
-    x, y, z, u_map, v_map = generate_moebius_manifold(RESOLUTION)
+    x, y, z, u_map, v_map = generate_Möbius_manifold(RESOLUTION)
     
     tension = np.sin(5 * u_map) * np.cos(v_map * 2) 
     
