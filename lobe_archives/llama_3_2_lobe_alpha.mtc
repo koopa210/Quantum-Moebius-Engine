@@ -1,4 +1,0 @@
-TIC_QUANTUM_V25
-SIG_START8d94c3c2e5b70fbac45396b8499afb05635402e5feec35ba25082ea120ad87eaSIG_END
-META_START{"version": "v25.0", "model": "Llama-3.2-3B", "segment": "Header_0_50MB", "parity": "8d94c3c2e5b70fbac45396b8499afb05635402e5feec35ba25082ea120ad87ea", "folding": {"theta": "0.158229", "gamma": "2.110394", "singularity_coord": [42.1, -15.5, 303.9], "manifold_id": "MOBIUS_V25_STABILIZED"}}META_END
-DATA_START
